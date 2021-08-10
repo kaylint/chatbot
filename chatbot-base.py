@@ -2,6 +2,7 @@
 from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 from chatterbot.trainers import ChatterBotCorpusTrainer
+import pickle
 
 #create instance
 bot = ChatBot(
@@ -21,24 +22,22 @@ bot = ChatBot(
         'chatterbot.logic.MathematicalEvaluation',
         #'chatterbot.logic.TimeLogicAdapter'
     ],
-    database_uri='sqlite:///database.sqlite3'
+    database_uri='sqlite:///dhl.sqlite3'
 )
 
 #train bot - premeditated responses
 trainer = ListTrainer(bot)
-with open('conversation.txt') as f:
-    lines = f.read()
-lines = lines.splitlines()
-for i in lines:
-    trainer.train(i)
-f.close()
+with open('data/dhl-faq.txt',"rb") as fp:
+    dhl=pickle.load(fp)
+with open('data/greeting.txt',"rb") as fp:
+    greeting=pickle.load(fp)
+
+trainer.train(dhl)
+trainer.train(greeting)
 
 #train bot - english corpus
 trainer = ChatterBotCorpusTrainer(bot)
-
-trainer.train(
-    "chatterbot.corpus.english"
-)
+trainer.train("chatterbot.corpus.english")
 
 name=input("Enter Your Name: ")
 print("Welcome to the Bot Service! Let me know how can I help you?")
